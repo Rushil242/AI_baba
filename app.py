@@ -31,9 +31,9 @@ def main():
         st.stop()
 
     with st.sidebar:
-        st.markdown("### 🔮 About AI Baba")
+        st.markdown("### 🔮 About AI Fortune Teller")
         st.markdown(
-            "AI Baba is a zodiac-based RAG app powered by **Gemini AI**, "
+            "AI Fortune teller is a zodiac-based RAG app powered by **Gemini AI**, "
             "**FAISS vector retrieval**, and **Puter.js image generation**."
         )
         st.markdown("---")
