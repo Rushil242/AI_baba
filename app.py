@@ -41,22 +41,18 @@ def main():
         st.markdown("🖼️ Incident images are generated automatically after each reading.")
 
     # ── Input card ──────────────────────────────────────────────────────────
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    with st.container(border=True):
+        col_a, col_b = st.columns([1, 1], gap="large")
+        with col_a:
+            name = st.text_input("👤 Your Name", placeholder="e.g. Rushil")
+        with col_b:
+            dob = st.date_input("🎂 Date of Birth")
 
-    col_a, col_b = st.columns([1, 1], gap="large")
-    with col_a:
-        name = st.text_input("👤 Your Name", placeholder="e.g. Rushil")
-    with col_b:
-        dob = st.date_input("🎂 Date of Birth")
-
-    col_c, col_d = st.columns([1, 1], gap="large")
-    with col_c:
-        build_index = st.checkbox("🔄 Rebuild vector DB from PDFs", value=False)
-    with col_d:
-        st.markdown("<br>", unsafe_allow_html=True)
-        generate_btn = st.button("✨ Generate My Reading", use_container_width=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
+        col_c, col_d = st.columns([1, 1], gap="large")
+        with col_c:
+            build_index = st.checkbox("🔄 Rebuild vector DB from PDFs", value=False)
+        with col_d:
+            generate_btn = st.button("✨ Generate My Reading", use_container_width=True)
 
     # ── Generation logic ─────────────────────────────────────────────────────
     if generate_btn:
@@ -119,16 +115,25 @@ def main():
         # Personality + Prediction cards side by side
         col1, col2 = st.columns([1, 1], gap="large")
         with col1:
-            st.markdown('<div class="result-card">', unsafe_allow_html=True)
-            st.markdown("#### 🧠 Personality Snapshot")
-            st.write(result.get("personality_snapshot", ""))
-            st.markdown('</div>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("#### 🧠 Personality Snapshot")
+                st.markdown(
+                    f'<p class="card-text">{result.get("personality_snapshot", "")}</p>',
+                    unsafe_allow_html=True,
+                )
 
         with col2:
-            st.markdown('<div class="result-card highlight-card">', unsafe_allow_html=True)
-            st.markdown("#### 🔮 Today's Incident Prediction")
-            st.write(result.get("incident_prediction", ""))
-            st.markdown('</div>', unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown(
+                    '<div class="highlight-card-inner">',
+                    unsafe_allow_html=True,
+                )
+                st.markdown("#### 🔮 Today's Incident Prediction")
+                st.markdown(
+                    f'<p class="card-text">{result.get("incident_prediction", "")}</p>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown('</div>', unsafe_allow_html=True)
 
         # Auto-generated incident image (no button, no prompt shown)
         image_prompt = result.get("image_prompt", "").strip()
