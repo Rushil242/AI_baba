@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# AI/ML Specifics (Large datasets and weights)
+data/
+datasets/
+models/
+weights/
+*.h5
+*.pkl
+*.pickle
+*.pth
+*.pt
+*.onnx
+*.ckpt
+*.pb
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Logs and history
+logs/
+*.log
+.wandb/
+wandb/
+mlflow/
