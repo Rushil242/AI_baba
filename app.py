@@ -1,4 +1,6 @@
 import streamlit as st
+from datetime import date  # NEW: for date range
+
 from src.config import APP_TITLE, APP_SUBTITLE, GEMINI_API_KEY, VECTOR_DIR
 from src.ui_components import render_header, render_auto_image, inject_custom_css
 from src.zodiac import get_zodiac_sign, parse_dob
@@ -9,7 +11,6 @@ from src.llm_utils import generate_fortune, parse_response_blocks
 
 st.set_page_config(page_title=APP_TITLE, page_icon="🔮", layout="wide")
 
-# Inject React-style light theme CSS
 inject_custom_css()
 
 
@@ -46,7 +47,13 @@ def main():
         with col_a:
             name = st.text_input("👤 Your Name", placeholder="e.g. Rushil")
         with col_b:
-            dob = st.date_input("🎂 Date of Birth")
+            # LIMIT DOB BETWEEN 1970-01-01 AND TODAY
+            dob = st.date_input(
+                "🎂 Date of Birth",
+                value=date(1995, 1, 1),
+                min_value=date(1970, 1, 1),
+                max_value=date.today(),
+            )
 
         col_c, col_d = st.columns([1, 1], gap="large")
         with col_c:
@@ -74,7 +81,11 @@ def main():
         with st.spinner("🔍 Retrieving zodiac context..."):
             context, docs = retrieve_context(vectordb, zodiac_sign)
 
-        prompt = build_fortune_prompt(name=name, zodiac_sign=zodiac_sign, retrieved_context=context)
+        prompt = build_fortune_prompt(
+            name=name,
+            zodiac_sign=zodiac_sign,
+            retrieved_context=context,
+        )
 
         with st.spinner("🌟 Generating your reading with Gemini..."):
             output_text = generate_fortune(prompt)
@@ -88,31 +99,33 @@ def main():
     result = st.session_state.get("result")
     if result:
         zodiac_sign = result.get("zodiac_sign") or st.session_state.get("zodiac", "")
-        st.markdown("---")
 
-        # Top result row — zodiac badge + personality
         st.markdown(
             f'<div class="zodiac-badge">♈ {zodiac_sign}</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-        # Stat pills row
-        lucky_color  = result.get("lucky_color", "—")
+        lucky_color = result.get("lucky_color", "—")
         lucky_number = result.get("lucky_number", "—")
-        best_hour    = result.get("best_hour", "—")
+        best_hour = result.get("best_hour", "—")
 
         st.markdown(
             f"""
             <div class="stats-row">
-                <div class="stat-pill">🎨 <strong>Lucky Color</strong><br>{lucky_color}</div>
-                <div class="stat-pill">🔢 <strong>Lucky Number</strong><br>{lucky_number}</div>
-                <div class="stat-pill">⏰ <strong>Best Hour</strong><br>{best_hour}</div>
+                <div class="stat-pill">
+                    <strong>🎨 Lucky Color</strong>{lucky_color}
+                </div>
+                <div class="stat-pill">
+                    <strong>🔢 Lucky Number</strong>{lucky_number}
+                </div>
+                <div class="stat-pill">
+                    <strong>⏰ Best Hour</strong>{best_hour}
+                </div>
             </div>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
-        # Personality + Prediction cards side by side
         col1, col2 = st.columns([1, 1], gap="large")
         with col1:
             with st.container(border=True):
@@ -124,34 +137,30 @@ def main():
 
         with col2:
             with st.container(border=True):
-                st.markdown(
-                    '<div class="highlight-card-inner">',
-                    unsafe_allow_html=True,
-                )
                 st.markdown("#### 🔮 Today's Incident Prediction")
                 st.markdown(
                     f'<p class="card-text">{result.get("incident_prediction", "")}</p>',
                     unsafe_allow_html=True,
                 )
-                st.markdown('</div>', unsafe_allow_html=True)
 
-        # Auto-generated incident image (no button, no prompt shown)
         image_prompt = result.get("image_prompt", "").strip()
         if image_prompt:
-            st.markdown("---")
             st.markdown("#### 🖼️ Incident Image")
             render_auto_image(image_prompt)
 
-        # Context expander
         with st.expander("📄 Retrieved Context Chunks"):
             for i, doc in enumerate(st.session_state.get("sources", []), start=1):
                 st.markdown(f"**Chunk {i}:**")
-                st.write(doc.page_content[:1200] + ("..." if len(doc.page_content) > 1200 else ""))
+                st.write(
+                    doc.page_content[:1200]
+                    + ("..." if len(doc.page_content) > 1200 else "")
+                )
 
     else:
         st.markdown(
-            '<div class="empty-state">Enter your name and date of birth above, then click <strong>Generate My Reading</strong>.</div>',
-            unsafe_allow_html=True
+            '<div class="empty-state">Enter your name and date of birth above, '
+            'then click <strong>Generate My Reading</strong>.</div>',
+            unsafe_allow_html=True,
         )
 
 
