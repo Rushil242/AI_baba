@@ -9,3 +9,4 @@ pypdf>=4.2.0
 sentence-transformers>=2.7.0
 requests>=2.32.0
 torchvision
+PyPDF2>=3.0.0
