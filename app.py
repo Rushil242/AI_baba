@@ -2,7 +2,7 @@ import streamlit as st
 from src.config import APP_TITLE, APP_SUBTITLE, GEMINI_API_KEY, VECTOR_DIR
 from src.ui_components import render_header, render_puter_image_generator
 from src.zodiac import get_zodiac_sign, parse_dob
-from src.pdf_utils import download_pdfs, extract_text_from_pdfs
+from src.pdf_utils import extract_text_from_pdfs
 from src.rag_pipeline import build_vector_store, load_vector_store, retrieve_context
 from src.prompts import build_fortune_prompt
 from src.llm_utils import generate_fortune, parse_response_blocks
@@ -46,7 +46,8 @@ def main():
 
             with st.spinner("Preparing knowledge base..."):
                 if build_index:
-                    pdfs = download_pdfs()
+                    from src.pdf_utils import get_pdf_paths
+                    pdfs = get_pdf_paths()
                     texts = extract_text_from_pdfs(pdfs)
                     vectordb = build_vector_store(texts)
                 else:
